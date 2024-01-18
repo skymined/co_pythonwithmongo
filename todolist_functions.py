@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 
 def Connect_Mongo(collection_name):
-    mongoClient = MongoClient("mongodb://localhost:27017")    # mongodb 접속
+    mongoClient = MongoClient("mongodb://mongodb:27017")    # mongodb 접속
     database = mongoClient["local"]   # database 연결
     return database[collection_name]        # collection 작업
 
@@ -11,7 +11,7 @@ def Data_insert(collection, data):
     collection.delete_many({})
     # collection.delete_many({}) # 왜 두개 있는지 모르겠어서 삭제
     # 데이터 입력
-    collection.insert_one({data})           # hint -> insert이므로
+    collection.insert_many(data)           # hint -> one->many
 
 # 사용자 이름 입력 function
 def User_name(collection):
@@ -29,7 +29,7 @@ def Todos(user_id, collection1, collection2):
     print("ToDo List 중 하나 선택 하세요 !")
 
     # todos_list 컬렉션의 내용 중 'title'만 print
-    result_todo = user_id.find({'title'})           # hint -> 'title'을 print 하고자 하므로 find 안에 'title' 입력
+    result_todo = collection1.find({})           # hint -> collection1으로 변경
     count = 1
     for i in result_todo:
         print("{}. {}".format(count, i["title"]), end=" ")           # hint -> print 안에 필요없는 {} 삭제
@@ -51,8 +51,8 @@ def Todos(user_id, collection1, collection2):
     collection2.insert_one({"user_id" : user_id, "user_todo_id" : inserted_todo_id, "todo_title" : inserted_todo, "user_status" : user_status})
 
 # 종료 여부 입력 function
-def End(user_id, collection1, collection2):           # hint -> 내부에 있는 함수인 Todos에 user_id가 필요하므로 해당 부분 추가
-    user_end = input()           # hint -> input값으로 넣어줘야 함.
+def End(collection, collection1, collection2):   # hint -> user_name에 들어갈 collection 추가
+    user_end = 'q'          # hint -> 계속해야 하므로 q로 변경
     while True:
         # c 입력 시 Todos() 다시 실행
         if user_end == "c":
